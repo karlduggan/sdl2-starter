@@ -1,18 +1,41 @@
-#include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <iostream>
+#include <vector>
+#include <Utils.hpp>
+#include <Game.hpp>
 
-int main()
+Game *game = nullptr;
+
+int main(int argc, char *args[])
 {
-  if (SDL_Init(SDL_INIT_EVERYTHING) > 0)
+
+  const int FPS = 60;
+  const int frameDelay = 1000 / FPS;
+
+  Uint32 frameStart;
+  int frameTime;
+
+  game = new Game();
+
+  game->init("Game v0.1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 640, false);
+
+  // Game Loop
+  while (game->running())
   {
-    std::cout << "SDL_Init failed with error: " << SDL_GetError() << std::endl;
-    return EXIT_FAILURE;
+    frameStart = SDL_GetTicks();
+
+    game->handleEvents();
+    game->update();
+    game->render();
+
+    frameTime = SDL_GetTicks() - frameStart;
+
+    if (frameDelay > frameTime)
+    {
+      SDL_Delay(frameDelay - frameTime);
+    }
   }
-
-  std::string greetings = "Hello SDL2!";
-  std::cout << greetings << std::endl;
-
-  SDL_Quit();
-
-  return EXIT_SUCCESS;
+  game->clean();
+  return 0;
 }
